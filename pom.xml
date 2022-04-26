@@ -154,6 +154,7 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>2.6.7</version>
             </plugin>
             <plugin>
                 <groupId>ro.isdc.wro4j</groupId>
