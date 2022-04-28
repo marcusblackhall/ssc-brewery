@@ -3,6 +3,7 @@ package guru.sfg.brewery.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -35,21 +36,40 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     }
 
+    /**
+     * Override method to configure UserDetailsService with a fluent API
+     * @param auth
+     * @throws Exception
+     */
     @Override
-    @Bean
-    public UserDetailsService userDetailsServiceBean() throws Exception {
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        auth.inMemoryAuthentication()
+                .withUser("marcus")
+                .password("{noop}marcus") // noop ensures using an encoder
+                .roles("ADMIN")
+                .and()
+                .withUser("user")
+                .password("{noop}password")
+                .roles("USER")
+        ;
 
-        UserDetails userDetails = User.withDefaultPasswordEncoder()
-                .username("user")
-                .password("password")
-                .roles("USER").build();
+   }
 
-        UserDetails userDetails2 = User.withDefaultPasswordEncoder()
-                .username("marcus")
-                .password("marcus")
-                .roles("ADMIN").build();
-
-
-        return new InMemoryUserDetailsManager(userDetails,userDetails2);
-    }
+//    @Override
+//    @Bean
+//    public UserDetailsService userDetailsServiceBean() throws Exception {
+//
+//        UserDetails userDetails = User.withDefaultPasswordEncoder()
+//             .username("user")
+//                .password("password")
+//                .roles("USER").build();
+//
+//        UserDetails userDetails2 = User.withDefaultPasswordEncoder()
+//                .username("marcus")
+//                .password("marcus")
+//                .roles("ADMIN").build();
+//
+//
+//        return new InMemoryUserDetailsManager(userDetails,userDetails2);
+//    }
 }
