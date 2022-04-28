@@ -138,4 +138,7 @@ public class BeerServiceImpl implements BeerService {
     public BeerDto findBeerByUpc(String upc) {
         return beerMapper.beerToBeerDto(beerRepository.findByUpc(upc));
     }
+
+
 }
+

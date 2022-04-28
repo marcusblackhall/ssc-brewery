@@ -5,12 +5,18 @@ import guru.sfg.brewery.repositories.BeerRepository;
 import guru.sfg.brewery.repositories.CustomerRepository;
 import guru.sfg.brewery.services.BeerService;
 import guru.sfg.brewery.services.BreweryService;
+import org.assertj.core.api.StandardSoftAssertionsProvider;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.crypto.password.LdapShaPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.crypto.password.StandardPasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -20,8 +26,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 @WebMvcTest
 public class BeerControllerIT extends BaseIT {
-
-
 
 
     @MockBean
@@ -42,28 +46,40 @@ public class BeerControllerIT extends BaseIT {
 
     @Test
     @DisplayName("Test using In memory authentication")
-    void inMemoryAuthenication() throws Exception{
+    void inMemoryAuthenication() throws Exception {
         mockMvc.perform(get("/beers/new")
-                        .with(httpBasic("user","password")))
+                        .with(httpBasic("user", "password")))
                 .andExpect(status().isOk())
                 .andExpect(view().name("beers/createBeer"));
     }
 
     @Test
     @DisplayName("Test added new user scott")
-    void inMemoryAuthenicationForScott() throws Exception{
+    void inMemoryAuthenicationForScott() throws Exception {
         mockMvc.perform(get("/beers/new")
-                        .with(httpBasic("scott","tiger")))
+                        .with(httpBasic("scott", "tiger")))
                 .andExpect(status().isOk())
                 .andExpect(view().name("beers/createBeer"));
     }
 
-
+    @Test
+    void showLadapEncoder() {
+        PasswordEncoder passwordEncoder = new LdapShaPasswordEncoder();
+        System.out.println(passwordEncoder.encode("password"));
+        assertTrue(passwordEncoder.matches("password",passwordEncoder.encode("password")));
+    }
+    @Test
+    void showSha256Encoder() {
+        PasswordEncoder passwordEncoder = new StandardPasswordEncoder();
+        System.out.println(passwordEncoder.encode("password"));
+        System.out.println(passwordEncoder.encode("password"));
+        assertTrue(passwordEncoder.matches("password",passwordEncoder.encode("password")));
+    }
 
     @WithMockUser("spring")
     @DisplayName("Useing mocked authenticated user")
     @Test
-    void findBeers() throws Exception{
+    void findBeers() throws Exception {
         mockMvc.perform(get("/beers/find"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("beers/findBeers"))
@@ -73,17 +89,18 @@ public class BeerControllerIT extends BaseIT {
     @WithMockUser("test")
     @DisplayName("Useing mocked authenticated user")
     @Test
-    void findBeersWithOtherUser() throws Exception{
+    void findBeersWithOtherUser() throws Exception {
         mockMvc.perform(get("/beers/find"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("beers/findBeers"))
                 .andExpect(model().attributeExists("beer"));
     }
+
     @Test
     @DisplayName("Test using the spring config")
-    void findBeersWithAuthentication() throws Exception{
+    void findBeersWithAuthentication() throws Exception {
         mockMvc.perform(get("/beers/find")
-                        .with(httpBasic("marcus","marcus")))
+                        .with(httpBasic("marcus", "marcus")))
                 .andExpect(status().isOk())
                 .andExpect(view().name("beers/findBeers"))
                 .andExpect(model().attributeExists("beer"));
