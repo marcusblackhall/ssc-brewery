@@ -49,6 +49,15 @@ public class BeerControllerIT extends BaseIT {
                 .andExpect(view().name("beers/createBeer"));
     }
 
+    @Test
+    @DisplayName("Test added new user scott")
+    void inMemoryAuthenicationForScott() throws Exception{
+        mockMvc.perform(get("/beers/new")
+                        .with(httpBasic("scott","tiger")))
+                .andExpect(status().isOk())
+                .andExpect(view().name("beers/createBeer"));
+    }
+
 
 
     @WithMockUser("spring")
