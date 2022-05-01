@@ -12,6 +12,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.crypto.password.StandardPasswordEncoder;
@@ -24,7 +25,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public PasswordEncoder passwordEncoder(){
 //        return NoOpPasswordEncoder.getInstance();
-        return new BCryptPasswordEncoder(10);
+        PasswordEncoder delegatingPasswordEncoder = MarcusEncoderFactories.createDelegatingPasswordEncoder();
+        return delegatingPasswordEncoder;
     }
 
     @Override
@@ -59,13 +61,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .withUser("user")
 //                .password("{noop}password")
-                .password("$2a$10$VVewZvXmgyp7EX/iLPOuJeL.SL1CdXr/fkqFbcF87p0BSB8aJBCf2")
+                .password("{bcrypt}$2a$10$en/GyDVUZpPH7wgUtL3nIejn7YP8t3JG7kGDhIJyr51URmUG.5v7.")
                 .roles("USER")
                 .and()
                 .withUser("scott")
-//                .password("{noop}tiger")
-                .password("tiger")
-                .roles("CUSTOMER")
+                .password("{bcrypt15}$2a$15$ATC4mZEBReUhRdpCJA8zne0sbIUnLBgKFOK5AueQtkhwDV5Od2e9u")
+                .roles("ADMIN")
         ;
 
    }
