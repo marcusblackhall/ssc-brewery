@@ -11,8 +11,10 @@ import org.springframework.security.config.annotation.web.configurers.Expression
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.crypto.password.StandardPasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 
 @Configuration
@@ -21,7 +23,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Bean
     public PasswordEncoder passwordEncoder(){
-        return NoOpPasswordEncoder.getInstance();
+//        return NoOpPasswordEncoder.getInstance();
+        return new BCryptPasswordEncoder(10);
     }
 
     @Override
@@ -51,12 +54,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.inMemoryAuthentication()
                 .withUser("marcus")
-                .password("{noop}marcus") // noop ensures using an encoder
+                .password("$2a$10$bWVuFZZLnElc9mdw01bkaewDD3tXOOrldxk28xgWl2f8xyRSBfE3O") // noop ensures using an encoder
                 .roles("ADMIN")
                 .and()
                 .withUser("user")
 //                .password("{noop}password")
-                .password("password")
+                .password("$2a$10$VVewZvXmgyp7EX/iLPOuJeL.SL1CdXr/fkqFbcF87p0BSB8aJBCf2")
                 .roles("USER")
                 .and()
                 .withUser("scott")

@@ -71,8 +71,8 @@ public class BeerControllerIT extends BaseIT {
     @Test
     void showSha256Encoder() {
         PasswordEncoder passwordEncoder = new StandardPasswordEncoder();
-        System.out.println(passwordEncoder.encode("password"));
-        System.out.println(passwordEncoder.encode("password"));
+        System.out.println(passwordEncoder.encode("marcus"));
+        System.out.println(passwordEncoder.encode("marcus"));
         assertTrue(passwordEncoder.matches("password",passwordEncoder.encode("password")));
     }
 
