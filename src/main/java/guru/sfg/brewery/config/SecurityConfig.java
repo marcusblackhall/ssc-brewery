@@ -56,7 +56,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.inMemoryAuthentication()
                 .withUser("marcus")
-                .password("$2a$10$bWVuFZZLnElc9mdw01bkaewDD3tXOOrldxk28xgWl2f8xyRSBfE3O") // noop ensures using an encoder
+                .password("{bcrypt}$2a$10$bWVuFZZLnElc9mdw01bkaewDD3tXOOrldxk28xgWl2f8xyRSBfE3O") // noop ensures using an encoder
                 .roles("ADMIN")
                 .and()
                 .withUser("user")
