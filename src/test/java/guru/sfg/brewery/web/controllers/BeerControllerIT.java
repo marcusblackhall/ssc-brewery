@@ -1,21 +1,13 @@
 package guru.sfg.brewery.web.controllers;
 
-import guru.sfg.brewery.repositories.BeerInventoryRepository;
-import guru.sfg.brewery.repositories.BeerRepository;
-import guru.sfg.brewery.repositories.CustomerRepository;
-import guru.sfg.brewery.services.BeerService;
-import guru.sfg.brewery.services.BreweryService;
-import org.assertj.core.api.StandardSoftAssertionsProvider;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.crypto.password.LdapShaPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.crypto.password.StandardPasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -28,21 +20,20 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class BeerControllerIT extends BaseIT {
 
 
-    @MockBean
-    BeerRepository beerRepository;
+    @Test
+    void initCreationForm() throws Exception {
+        mockMvc.perform(get("/beers/new").with(httpBasic("user", "password")))
+                .andExpect(status().isOk())
+                .andExpect(view().name("beers/createBeer"))
+                .andExpect(model().attributeExists("beer"));
+    }
 
-    @MockBean
-    BeerInventoryRepository beerInventoryRepository;
 
-    @MockBean
-    BreweryService breweryService;
-
-    @MockBean
-    CustomerRepository customerRepository;
-
-    @MockBean
-    BeerService beerService;
-
+    @Test
+    void testGetIndexSlash() throws Exception {
+        mockMvc.perform(get("/"))
+                .andExpect(status().isOk());
+    }
 
     @Test
     @DisplayName("Test using In memory authentication")
@@ -52,6 +43,7 @@ public class BeerControllerIT extends BaseIT {
                 .andExpect(status().isOk())
                 .andExpect(view().name("beers/createBeer"));
     }
+
 
     @Test
     @DisplayName("Test added new user scott")
@@ -66,14 +58,15 @@ public class BeerControllerIT extends BaseIT {
     void showLadapEncoder() {
         PasswordEncoder passwordEncoder = new LdapShaPasswordEncoder();
         System.out.println(passwordEncoder.encode("password"));
-        assertTrue(passwordEncoder.matches("password",passwordEncoder.encode("password")));
+        assertTrue(passwordEncoder.matches("password", passwordEncoder.encode("password")));
     }
+
     @Test
     void showSha256Encoder() {
         PasswordEncoder passwordEncoder = new StandardPasswordEncoder();
         System.out.println(passwordEncoder.encode("marcus"));
         System.out.println(passwordEncoder.encode("marcus"));
-        assertTrue(passwordEncoder.matches("password",passwordEncoder.encode("password")));
+        assertTrue(passwordEncoder.matches("password", passwordEncoder.encode("password")));
     }
 
     @WithMockUser("spring")
