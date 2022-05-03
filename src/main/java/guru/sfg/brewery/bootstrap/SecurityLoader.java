@@ -25,7 +25,6 @@ public class SecurityLoader implements CommandLineRunner {
     @Override
     public void run(String... args) {
 
-        deleteAll();
         addTestData();
         listAllUsers();
 
@@ -38,13 +37,17 @@ public class SecurityLoader implements CommandLineRunner {
     }
 
     private void addTestData() {
+
+        if (authorityRepository.count() != 0) {
+            return;
+        }
         Authority authority1 = new Authority();
         authority1.setRole("ADMIN");
         authorityRepository.save(authority1);
 
-        Authority authority2 = new Authority();
-        authority2.setRole("CUSTOMER");
+        Authority authority2 = Authority.builder().role("CUSTOMER").build();
         authorityRepository.save(authority2);
+
 
         User user1 = new User();
         user1.setUsername("marcus");
@@ -52,11 +55,9 @@ public class SecurityLoader implements CommandLineRunner {
         user1.setPassword(bCryptPasswordEncoder.encode("marcus"));
         user1.setAuthorities(Set.of((authority1)));
 
-        User user2 = new User();
-        user2.setUsername("scott");
         BCryptPasswordEncoder bCryptPasswordEncoder15 = new BCryptPasswordEncoder(15);
-        user2.setPassword(bCryptPasswordEncoder15.encode("tiger"));
-        user2.setAuthorities(Set.of((authority1)));
+        User user2 = User.builder().username("scott").password(bCryptPasswordEncoder15.encode("tiger")).authority(authority1).build();
+
 
         User user3 = new User();
         user3.setUsername("user");
@@ -65,13 +66,7 @@ public class SecurityLoader implements CommandLineRunner {
 
         userRepository.saveAll(List.of(user1, user2, user3));
 
-        log.info("created user marcus");
-    }
-
-    private void deleteAll() {
-        authorityRepository.deleteAll();
-        userRepository.deleteAll();
-        log.info("Deleted all users and authorities");
+        log.info("No. users created {}",userRepository.count());
     }
 
 
