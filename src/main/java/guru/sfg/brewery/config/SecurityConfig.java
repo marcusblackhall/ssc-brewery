@@ -1,11 +1,11 @@
 package guru.sfg.brewery.config;
 
 import guru.sfg.brewery.security.RestHeaderAuthFilter;
+import guru.sfg.brewery.security.UrlParametersAuthFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -18,29 +18,43 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-    public RestHeaderAuthFilter restHeaderAuthFilter(AuthenticationManager authenticationManager){
+    public RestHeaderAuthFilter restHeaderAuthFilter(AuthenticationManager authenticationManager) {
 
         RestHeaderAuthFilter filter = new RestHeaderAuthFilter(
                 new AntPathRequestMatcher("/api/**"));
         filter.setAuthenticationManager(authenticationManager);
 
-        return  filter;
+        return filter;
 
     }
+
+    public UrlParametersAuthFilter urlParametersAuthFilter(AuthenticationManager authenticationManager) {
+
+        UrlParametersAuthFilter filter = new UrlParametersAuthFilter(
+                new AntPathRequestMatcher("/api/**"));
+        filter.setAuthenticationManager(authenticationManager);
+
+        return filter;
+
+    }
+
     @Bean
     public PasswordEncoder passwordEncoder() {
-//        return NoOpPasswordEncoder.getInstance();
-        PasswordEncoder delegatingPasswordEncoder = MarcusEncoderFactories.createDelegatingPasswordEncoder();
-        return delegatingPasswordEncoder;
+        return MarcusEncoderFactories.createDelegatingPasswordEncoder();
     }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
 
         http.addFilterBefore(restHeaderAuthFilter(authenticationManager()),
-                UsernamePasswordAuthenticationFilter.class)
-                .csrf().disable()
-        ;
+                        UsernamePasswordAuthenticationFilter.class)
+                .csrf().disable();
+
+
+
+        http.addFilterBefore(urlParametersAuthFilter(authenticationManager()),
+                        UsernamePasswordAuthenticationFilter.class)
+                .csrf().disable();
 
         http
                 .authorizeRequests(authorize ->
@@ -82,7 +96,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         ;
 
     }
-
 
 
 //    @Override
