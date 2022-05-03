@@ -6,7 +6,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -51,9 +50,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .csrf().disable();
 
 
-
         http.addFilterBefore(urlParametersAuthFilter(authenticationManager()),
-                        UsernamePasswordAuthenticationFilter.class);
+                UsernamePasswordAuthenticationFilter.class);
 
 
         http
@@ -75,30 +73,31 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     }
 
+
     /**
      * Override method to configure UserDetailsService with a fluent API
      *
      * @param auth
      * @throws Exception
      */
-    @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.inMemoryAuthentication()
-                .withUser("marcus")
-                .password("{bcrypt}$2a$10$bWVuFZZLnElc9mdw01bkaewDD3tXOOrldxk28xgWl2f8xyRSBfE3O") // noop ensures using an encoder
-                .roles("ADMIN")
-                .and()
-                .withUser("user")
-//                .password("{noop}password")
-                .password("{bcrypt}$2a$10$en/GyDVUZpPH7wgUtL3nIejn7YP8t3JG7kGDhIJyr51URmUG.5v7.")
-                .roles("USER")
-                .and()
-                .withUser("scott")
-                .password("{bcrypt15}$2a$15$ATC4mZEBReUhRdpCJA8zne0sbIUnLBgKFOK5AueQtkhwDV5Od2e9u")
-                .roles("ADMIN")
-        ;
-
-    }
+//    @Override
+//    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+//        auth.inMemoryAuthentication()
+//                .withUser("marcus")
+//                .password("{bcrypt}$2a$10$bWVuFZZLnElc9mdw01bkaewDD3tXOOrldxk28xgWl2f8xyRSBfE3O") // noop ensures using an encoder
+//                .roles("ADMIN")
+//                .and()
+//                .withUser("user")
+////                .password("{noop}password")
+//                .password("{bcrypt}$2a$10$en/GyDVUZpPH7wgUtL3nIejn7YP8t3JG7kGDhIJyr51URmUG.5v7.")
+//                .roles("USER")
+//                .and()
+//                .withUser("scott")
+//                .password("{bcrypt15}$2a$15$ATC4mZEBReUhRdpCJA8zne0sbIUnLBgKFOK5AueQtkhwDV5Od2e9u")
+//                .roles("ADMIN")
+//        ;
+//
+//    }
 
 
 //    @Override
