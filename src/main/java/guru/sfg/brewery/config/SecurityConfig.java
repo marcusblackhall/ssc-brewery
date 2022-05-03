@@ -53,8 +53,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 
         http.addFilterBefore(urlParametersAuthFilter(authenticationManager()),
-                        UsernamePasswordAuthenticationFilter.class)
-                .csrf().disable();
+                        UsernamePasswordAuthenticationFilter.class);
+
 
         http
                 .authorizeRequests(authorize ->
