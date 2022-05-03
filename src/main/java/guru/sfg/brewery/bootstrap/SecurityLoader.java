@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -21,6 +22,7 @@ public class SecurityLoader implements CommandLineRunner {
 
     private final UserRepository userRepository;
     private final AuthorityRepository authorityRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public void run(String... args) {
@@ -55,8 +57,7 @@ public class SecurityLoader implements CommandLineRunner {
         user1.setPassword(bCryptPasswordEncoder.encode("marcus"));
         user1.setAuthorities(Set.of((authority1)));
 
-        BCryptPasswordEncoder bCryptPasswordEncoder15 = new BCryptPasswordEncoder(15);
-        User user2 = User.builder().username("scott").password(bCryptPasswordEncoder15.encode("tiger")).authority(authority1).build();
+        User user2 = User.builder().username("scott").password(passwordEncoder.encode("tiger")).authority(authority1).build();
 
 
         User user3 = new User();
