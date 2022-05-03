@@ -54,7 +54,7 @@ public class SecurityLoader implements CommandLineRunner {
         User user1 = new User();
         user1.setUsername("marcus");
         BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
-        user1.setPassword(bCryptPasswordEncoder.encode("marcus"));
+        user1.setPassword(passwordEncoder.encode("marcus"));
         user1.setAuthorities(Set.of((authority1)));
 
         User user2 = User.builder().username("scott").password(passwordEncoder.encode("tiger")).authority(authority1).build();
@@ -62,7 +62,7 @@ public class SecurityLoader implements CommandLineRunner {
 
         User user3 = new User();
         user3.setUsername("user");
-        user3.setPassword(bCryptPasswordEncoder.encode("password"));
+        user3.setPassword(passwordEncoder.encode("password"));
         user3.setAuthorities(Set.of((authority2)));
 
         userRepository.saveAll(List.of(user1, user2, user3));
