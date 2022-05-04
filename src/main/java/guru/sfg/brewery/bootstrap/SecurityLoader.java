@@ -7,12 +7,10 @@ import guru.sfg.brewery.repositories.security.UserRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.Set;
 
 @AllArgsConstructor
 @Slf4j
@@ -52,24 +50,21 @@ public class SecurityLoader implements CommandLineRunner {
         Authority userAuthority = Authority.builder().role("ROLE_USER").build();
         authorityRepository.save(userAuthority);
 
+        User adminUser = User.builder().username("marcus").password(passwordEncoder.encode("marcus"))
+                .authority(adminAuthority).build();
 
-        User adminUser = new User();
-        adminUser.setUsername("marcus");
-        adminUser.setPassword(passwordEncoder.encode("marcus"));
-        adminUser.setAuthorities(Set.of((adminAuthority)));
+        User customerUser = User.builder().username("scott").password(passwordEncoder.encode("tiger"))
+                .authority(customerAuthority)
+                .build();
 
-        User customerUser
-                = User.builder().username("scott").password(passwordEncoder.encode("tiger")).authority(customerAuthority).build();
-
-
-        User userUser = new User();
-        userUser.setUsername("user");
-        userUser.setPassword(passwordEncoder.encode("password"));
-        userUser.setAuthorities(Set.of((userAuthority)));
+        User userUser = User.builder().username("user").password(passwordEncoder.encode("password"))
+                .authority((userAuthority))
+                .build();
 
         userRepository.saveAll(List.of(adminUser, customerUser, userUser));
 
-        log.info("No. users created {}",userRepository.count());
+        log.info("No. users created {}", userRepository.count());
+        assert userRepository.count() == 3;
     }
 
 
