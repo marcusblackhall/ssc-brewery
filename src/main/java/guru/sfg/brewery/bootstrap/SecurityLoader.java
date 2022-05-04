@@ -43,29 +43,31 @@ public class SecurityLoader implements CommandLineRunner {
         if (authorityRepository.count() != 0) {
             return;
         }
-        Authority authority1 = new Authority();
-        authority1.setRole("ADMIN");
-        authorityRepository.save(authority1);
+        Authority adminAuthority = Authority.builder().role("ROLE_ADMIN").build();
+        authorityRepository.save(adminAuthority);
 
-        Authority authority2 = Authority.builder().role("CUSTOMER").build();
-        authorityRepository.save(authority2);
+        Authority customerAuthority = Authority.builder().role("ROLE_CUSTOMER").build();
+        authorityRepository.save(customerAuthority);
 
-
-        User user1 = new User();
-        user1.setUsername("marcus");
-        BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
-        user1.setPassword(passwordEncoder.encode("marcus"));
-        user1.setAuthorities(Set.of((authority1)));
-
-        User user2 = User.builder().username("scott").password(passwordEncoder.encode("tiger")).authority(authority1).build();
+        Authority userAuthority = Authority.builder().role("ROLE_USER").build();
+        authorityRepository.save(userAuthority);
 
 
-        User user3 = new User();
-        user3.setUsername("user");
-        user3.setPassword(passwordEncoder.encode("password"));
-        user3.setAuthorities(Set.of((authority2)));
+        User adminUser = new User();
+        adminUser.setUsername("marcus");
+        adminUser.setPassword(passwordEncoder.encode("marcus"));
+        adminUser.setAuthorities(Set.of((adminAuthority)));
 
-        userRepository.saveAll(List.of(user1, user2, user3));
+        User customerUser
+                = User.builder().username("scott").password(passwordEncoder.encode("tiger")).authority(customerAuthority).build();
+
+
+        User userUser = new User();
+        userUser.setUsername("user");
+        userUser.setPassword(passwordEncoder.encode("password"));
+        userUser.setAuthorities(Set.of((userAuthority)));
+
+        userRepository.saveAll(List.of(adminUser, customerUser, userUser));
 
         log.info("No. users created {}",userRepository.count());
     }
