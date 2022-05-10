@@ -15,25 +15,23 @@ import org.springframework.security.crypto.password.PasswordEncoder;
  */
 @Configuration
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(securedEnabled = true)
+@EnableGlobalMethodSecurity(securedEnabled = true,prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
 
         http
-                .authorizeRequests(authorize -> {
-                    authorize
-                            .antMatchers("/h2-console/**").permitAll() //do not use in production!
-                            .antMatchers("/", "/webjars/**", "/login", "/resources/**").permitAll()
-                            .antMatchers("/beers/find").hasAnyRole("CUSTOMER","ADMIN","USER")
-                            .mvcMatchers("/beers/{beerID").hasAnyRole("CUSTOMER","ADMIN","USER")
-                            .antMatchers(HttpMethod.GET, "/api/v1/beer/**").hasAnyRole("CUSTOMER","ADMIN","USER")
-                            .mvcMatchers(HttpMethod.DELETE, "/api/v1/beer/**").hasRole("ADMIN")
-                            .mvcMatchers(HttpMethod.GET, "/api/v1/beerUpc/{upc}").permitAll()
-                            .mvcMatchers(HttpMethod.GET, "/brewery/breweries").hasRole("CUSTOMER")
-                            .antMatchers(HttpMethod.GET, "/brewery/api/v1/breweries").hasRole("CUSTOMER");
-                } )
+                .authorizeRequests(authorize -> authorize
+                        .antMatchers("/h2-console/**").permitAll() //do not use in production!
+                        .antMatchers("/", "/webjars/**", "/login", "/resources/**").permitAll()
+                        .antMatchers("/beers/find").hasAnyRole("CUSTOMER","ADMIN","USER")
+                        .mvcMatchers("/beers/{beerID").hasAnyRole("CUSTOMER","ADMIN","USER")
+                        .antMatchers(HttpMethod.GET, "/api/v1/beer/**").hasAnyRole("CUSTOMER","ADMIN","USER")
+                        .mvcMatchers(HttpMethod.DELETE, "/api/v1/beer/**").hasRole("ADMIN")
+                        .mvcMatchers(HttpMethod.GET, "/api/v1/beerUpc/{upc}").permitAll()
+                        .mvcMatchers(HttpMethod.GET, "/brewery/breweries").hasRole("CUSTOMER")
+                        .antMatchers(HttpMethod.GET, "/brewery/api/v1/breweries").hasRole("CUSTOMER"))
                 .authorizeRequests()
                 .anyRequest().authenticated()
                 .and()
