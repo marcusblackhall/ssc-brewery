@@ -41,13 +41,13 @@ public class SecurityLoader implements CommandLineRunner {
         if (authorityRepository.count() != 0) {
             return;
         }
-        Authority adminAuthority = Authority.builder().role("ROLE_ADMIN").build();
+        Authority adminAuthority = Authority.builder().permission("ROLE_ADMIN").build();
         authorityRepository.save(adminAuthority);
 
-        Authority customerAuthority = Authority.builder().role("ROLE_CUSTOMER").build();
+        Authority customerAuthority = Authority.builder().permission("ROLE_CUSTOMER").build();
         authorityRepository.save(customerAuthority);
 
-        Authority userAuthority = Authority.builder().role("ROLE_USER").build();
+        Authority userAuthority = Authority.builder().permission("ROLE_USER").build();
         authorityRepository.save(userAuthority);
 
         User adminUser = User.builder().username("marcus").password(passwordEncoder.encode("marcus"))
