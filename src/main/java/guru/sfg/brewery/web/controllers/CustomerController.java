@@ -35,6 +35,7 @@ import javax.validation.Valid;
 import java.util.List;
 import java.util.UUID;
 
+
 @RequiredArgsConstructor
 @RequestMapping("/customers")
 @Controller
@@ -49,7 +50,7 @@ public class CustomerController {
         return "customers/findCustomers";
     }
 
-    @Secured(value = {"ROLE_ADMIN","ROLE_CUSTOMER"})
+    @PreAuthorize("hasAnyRole('ADMIN','ROLE_CUSTOMER')")
     @GetMapping
     public String processFindFormReturnMany(Customer customer, BindingResult result, Model model){
         // find customers by name
