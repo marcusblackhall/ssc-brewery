@@ -33,27 +33,7 @@ public class BeerControllerIT extends BaseIT {
                 .andExpect(model().attributeExists("beer"));
     }
 
-    @ParameterizedTest(name = "#{index} with [{arguments}]")
-    @MethodSource("guru.sfg.brewery.web.controllers.BaseIT#getStreamOfAdminCustomers")
-    void shouldAllowCustomerAndAdmin(String user,String password) throws Exception {
-        log.info("{} {}",user,password);
-        mockMvc.perform(get("/customers")
-                .with(httpBasic(user,password)))
-                .andExpect(status().isOk());
-    }
-    @Test
-    void notLoggedInCannotListCustomers() throws Exception {
-        mockMvc.perform(get("/customers")).andExpect(status().isUnauthorized());
-    }
 
-    @ParameterizedTest(name = "#{index} with [{arguments}]")
-    @MethodSource("guru.sfg.brewery.web.controllers.BaseIT#getStreamOfUsers")
-    void shouldForbidUserToListCustomers(String user,String password) throws Exception {
-        log.info("{} {}",user,password);
-        mockMvc.perform(get("/customers")
-                        .with(httpBasic(user,password)))
-                .andExpect(status().isForbidden());
-    }
 
     @Test
     void testGetIndexSlash() throws Exception {

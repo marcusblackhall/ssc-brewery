@@ -12,7 +12,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class BreweriesControllerIT extends BaseIT {
 
     @Test
-    @DisplayName("Admin cannot view breweries")
+    @DisplayName("Admin can view breweries")
     void onlyCustomersCanListBreweries() throws Exception {
 
         mockMvc.perform(get("/brewery/breweries").with(httpBasic("marcus","marcus")))
