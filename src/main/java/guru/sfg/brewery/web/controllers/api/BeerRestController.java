@@ -48,6 +48,7 @@ public class BeerRestController {
     private final BeerService beerService;
 
     @GetMapping(produces = { "application/json" }, path = "beer")
+    @PreAuthorize("hasAuthority('beer.read')")
     public ResponseEntity<BeerPagedList> listBeers(@RequestParam(value = "pageNumber", required = false) Integer pageNumber,
                                                    @RequestParam(value = "pageSize", required = false) Integer pageSize,
                                                    @RequestParam(value = "beerName", required = false) String beerName,
@@ -74,6 +75,7 @@ public class BeerRestController {
     }
 
     @GetMapping(path = {"beer/{beerId}"}, produces = { "application/json" })
+    @PreAuthorize("hasAuthority('beer.read')")
     public ResponseEntity<BeerDto> getBeerById(@PathVariable("beerId") UUID beerId,
                                                @RequestParam(value = "showInventoryOnHand", required = false) Boolean showInventoryOnHand){
 
@@ -87,11 +89,15 @@ public class BeerRestController {
     }
 
     @GetMapping(path = {"beerUpc/{upc}"}, produces = { "application/json" })
+    @PreAuthorize("hasAuthority('beer.read')")
+
     public ResponseEntity<BeerDto> getBeerByUpc(@PathVariable("upc") String upc){
         return new ResponseEntity<>(beerService.findBeerByUpc(upc), HttpStatus.OK);
     }
 
     @PostMapping(path = "beer")
+    @PreAuthorize("hasAuthority('beer.create')")
+
     public ResponseEntity saveNewBeer(@Valid @RequestBody BeerDto beerDto){
 
         BeerDto savedDto = beerService.saveBeer(beerDto);
@@ -105,6 +111,8 @@ public class BeerRestController {
     }
 
     @PutMapping(path = {"beer/{beerId}"}, produces = { "application/json" })
+    @PreAuthorize("hasAuthority('beer.update')")
+
     public ResponseEntity updateBeer(@PathVariable("beerId") UUID beerId, @Valid @RequestBody BeerDto beerDto){
 
         beerService.updateBeer(beerId, beerDto);
@@ -114,7 +122,8 @@ public class BeerRestController {
 
     @DeleteMapping({"beer/{beerId}"})
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('beer.delete')")
+
     public void deleteBeer(@PathVariable("beerId") UUID beerId){
         beerService.deleteById(beerId);
     }
