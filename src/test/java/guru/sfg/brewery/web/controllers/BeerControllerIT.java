@@ -27,7 +27,7 @@ public class BeerControllerIT extends BaseIT {
 
     @Test
     void initCreationForm() throws Exception {
-        mockMvc.perform(get("/beers/new").with(httpBasic("user", "password")))
+        mockMvc.perform(get("/beers/new").with(httpBasic("marcus", "marcus")))
                 .andExpect(status().isOk())
                 .andExpect(view().name("beers/createBeer"))
                 .andExpect(model().attributeExists("beer"));
@@ -45,7 +45,7 @@ public class BeerControllerIT extends BaseIT {
     @DisplayName("Test using In memory authentication")
     void inMemoryAuthenication() throws Exception {
         mockMvc.perform(get("/beers/new")
-                        .with(httpBasic("user", "password")))
+                        .with(httpBasic("marcus", "marcus")))
                 .andExpect(status().isOk())
                 .andExpect(view().name("beers/createBeer"));
     }

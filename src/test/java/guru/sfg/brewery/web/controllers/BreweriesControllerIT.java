@@ -16,7 +16,7 @@ public class BreweriesControllerIT extends BaseIT {
     void onlyCustomersCanListBreweries() throws Exception {
 
         mockMvc.perform(get("/brewery/breweries").with(httpBasic("marcus","marcus")))
-                .andExpect(status().isForbidden());
+                .andExpect(status().is2xxSuccessful());
 
     }
 
