@@ -1,17 +1,16 @@
 package guru.sfg.brewery.web.controllers;
 
-import lombok.extern.slf4j.Slf4j;
+import guru.sfg.brewery.domain.Beer;
+import guru.sfg.brewery.repositories.BeerRepository;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.crypto.password.LdapShaPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.crypto.password.StandardPasswordEncoder;
-import org.springframework.security.test.context.support.WithMockUser;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.anonymous;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -20,97 +19,90 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * Created by jt on 6/12/20.
  */
 @SpringBootTest
-@Slf4j
-//@WebMvcTest
-public class BeerControllerIT extends BaseIT {
+public class BeerControllerIT extends BaseIT{
 
+    @Autowired
+    BeerRepository beerRepository;
 
-    @Test
-    void initCreationForm() throws Exception {
-        mockMvc.perform(get("/beers/new").with(httpBasic("marcus", "marcus")))
-                .andExpect(status().isOk())
-                .andExpect(view().name("beers/createBeer"))
-                .andExpect(model().attributeExists("beer"));
+    @DisplayName("Init New Form")
+    @Nested
+    class InitNewForm{
+
+        @Test
+        void initCreationFormAuth() throws Exception {
+
+            mockMvc.perform(get("/beers/new").with(httpBasic("spring", "guru")))
+                    .andExpect(status().isOk())
+                    .andExpect(view().name("beers/createBeer"))
+                    .andExpect(model().attributeExists("beer"));
+        }
+
+        @Test
+        void initCreationFormNotAuth() throws Exception {
+            mockMvc.perform(get("/beers/new"))
+                    .andExpect(status().isUnauthorized());
+        }
     }
 
+    @DisplayName("Init Find Beer Form")
+    @Nested
+    class FindForm{
+        @ParameterizedTest(name = "#{index} with [{arguments}]")
+        @MethodSource("guru.sfg.brewery.web.controllers.BeerControllerIT#getStreamAllUsers")
+        void findBeersFormAUTH(String user, String pwd) throws Exception{
+            mockMvc.perform(get("/beers/find")
+                            .with(httpBasic(user, pwd)))
+                    .andExpect(status().isOk())
+                    .andExpect(view().name("beers/findBeers"))
+                    .andExpect(model().attributeExists("beer"));
+        }
 
-
-    @Test
-    void testGetIndexSlash() throws Exception {
-        mockMvc.perform(get("/"))
-                .andExpect(status().isOk());
+        @Test
+        void findBeersWithAnonymous() throws Exception{
+            mockMvc.perform(get("/beers/find").with(anonymous()))
+                    .andExpect(status().isUnauthorized());
+        }
     }
 
-    @Test
-    @DisplayName("Test using In memory authentication")
-    void inMemoryAuthenication() throws Exception {
-        mockMvc.perform(get("/beers/new")
-                        .with(httpBasic("marcus", "marcus")))
-                .andExpect(status().isOk())
-                .andExpect(view().name("beers/createBeer"));
+        @DisplayName("Process Find Beer Form")
+    @Nested
+    class ProcessFindForm{
+        @Test
+        void findBeerForm() throws Exception {
+            mockMvc.perform(get("/beers").param("beerName", ""))
+                    .andExpect(status().isUnauthorized());
+        }
+
+        @ParameterizedTest(name = "#{index} with [{arguments}]")
+        @MethodSource("guru.sfg.brewery.web.controllers.BeerControllerIT#getStreamAllUsers")
+        void findBeerFormAuth(String user, String pwd) throws Exception {
+            mockMvc.perform(get("/beers").param("beerName", "")
+                            .with(httpBasic(user, pwd)))
+                    .andExpect(status().isOk());
+        }
     }
 
+    @DisplayName("Get Beer By Id")
+    @Nested
+    class GetByID {
+        @ParameterizedTest(name = "#{index} with [{arguments}]")
+        @MethodSource("guru.sfg.brewery.web.controllers.BeerControllerIT#getStreamAllUsers")
+        void getBeerByIdAUTH(String user, String pwd) throws Exception{
+            Beer beer = beerRepository.findAll().get(0);
 
-    @Test
-    @DisplayName("Test added new user scott")
-    void inMemoryAuthenicationForScott() throws Exception {
-        mockMvc.perform(get("/beers/new")
-                        .with(httpBasic("scott", "tiger")))
-                .andExpect(status().isOk())
-                .andExpect(view().name("beers/createBeer"));
+            mockMvc.perform(get("/beers/" + beer.getId())
+                    .with(httpBasic(user, pwd)))
+                    .andExpect(status().isOk())
+                    .andExpect(view().name("beers/beerDetails"))
+                    .andExpect(model().attributeExists("beer"));
+        }
+
+        @Test
+        void getBeerByIdNoAuth() throws Exception{
+            Beer beer = beerRepository.findAll().get(0);
+
+            mockMvc.perform(get("/beers/" + beer.getId()))
+                    .andExpect(status().isUnauthorized());
+        }
     }
-
-    @Test
-    void showLadapEncoder() {
-        PasswordEncoder passwordEncoder = new LdapShaPasswordEncoder();
-        System.out.println(passwordEncoder.encode("password"));
-        assertTrue(passwordEncoder.matches("password", passwordEncoder.encode("password")));
-    }
-
-    @Test
-    void showSha256Encoder() {
-        PasswordEncoder passwordEncoder = new StandardPasswordEncoder();
-        System.out.println(passwordEncoder.encode("marcus"));
-        System.out.println(passwordEncoder.encode("marcus"));
-        assertTrue(passwordEncoder.matches("password", passwordEncoder.encode("password")));
-    }
-
-    @WithMockUser("spring")
-    @DisplayName("Useing mocked authenticated user")
-    @Test
-    void findBeers() throws Exception {
-        mockMvc.perform(get("/beers/find"))
-                .andExpect(status().isOk())
-                .andExpect(view().name("beers/findBeers"))
-                .andExpect(model().attributeExists("beer"));
-    }
-
-    @WithMockUser("test")
-    @DisplayName("Useing mocked authenticated user")
-    @Test
-    void findBeersWithOtherUser() throws Exception {
-        mockMvc.perform(get("/beers/find"))
-                .andExpect(status().isOk())
-                .andExpect(view().name("beers/findBeers"))
-                .andExpect(model().attributeExists("beer"));
-    }
-
-    @Test
-    @DisplayName("Test using the spring config")
-    void findBeersWithAuthentication() throws Exception {
-        mockMvc.perform(get("/beers/find")
-                        .with(httpBasic("marcus", "marcus")))
-                .andExpect(status().isOk())
-                .andExpect(view().name("beers/findBeers"))
-                .andExpect(model().attributeExists("beer"));
-    }
-
-    @Test
-    @DisplayName("Mvc Matcher on beers upc")
-    void shouldAllowFindBeersUpc() throws Exception {
-
-        mockMvc.perform(get("/api/v1/beerUpc/0083783375213"))
-                .andExpect(status().isOk());
-    }
-
 }
