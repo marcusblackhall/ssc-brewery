@@ -28,16 +28,8 @@ public class JpaUserDetailsService implements UserDetailsService {
     @Transactional
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         log.info("Loading user {}", username);
-        guru.sfg.brewery.domain.security.User user = userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("Username unknown"));
-        return new User(user.getUsername(), user.getPassword()
-                , user.getEnabled(),
-                user.getAccountNonExpired(),
-                user.getCredentialsNonExpired(),
-                user.getAccountNonLocked(), convertToSpringAuthorities(user.getAuthorities()));
+        return  userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("Username unknown"));
     }
 
-    private Collection<? extends GrantedAuthority> convertToSpringAuthorities(Set<Authority> authorities) {
-        return authorities.stream().map(Authority::getPermission).map(SimpleGrantedAuthority::new).collect(Collectors.toSet());
-    }
 
 }
