@@ -98,9 +98,7 @@ public class UserDataLoader implements CommandLineRunner {
     @Transactional
     @Override
     public void run(String... args) throws Exception {
-        if (authorityRepository.count() == 0) {
-            loadSecurityData();
-        }
+
     }
 
 
