@@ -35,7 +35,7 @@ public class BeerRestControllerIT extends BaseIT {
     @Test
     void deleteBeerHttpBasicForAdminUser() throws Exception{
         mockMvc.perform(delete("/api/v1/beer/" + createBeer().getId())
-                .with(httpBasic("marcus", "marcus")))
+                .with(httpBasic("spring", "guru")))
                 .andExpect(status().is2xxSuccessful());
 
     }
@@ -70,7 +70,7 @@ public class BeerRestControllerIT extends BaseIT {
     void deleteBeer() throws Exception {
 
         mockMvc.perform(delete("/api/v1/beer/" + createBeer().getId())
-                .with(httpBasic("marcus","marcus"))
+                .with(httpBasic("spring","guru"))
         ).andExpect(status().is2xxSuccessful());
 
     }
