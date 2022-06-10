@@ -1,6 +1,7 @@
 package guru.sfg.brewery.config;
 
 import guru.sfg.brewery.config.MarcusEncoderFactories;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -8,7 +9,9 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 /**
@@ -17,7 +20,12 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
+@RequiredArgsConstructor
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
+
+    private final UserDetailsService userDetailsService;
+    private final PersistentTokenRepository persistentTokenRepository;
+
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -26,11 +34,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests(authorize -> authorize
                         .antMatchers("/h2-console/**").permitAll() //do not use in production!
                         .antMatchers("/", "/webjars/**", "/login", "/resources/**").permitAll()
-                        )
+                )
                 .authorizeRequests()
                 .anyRequest().authenticated()
                 .and()
-                .formLogin( loginConfigurer -> loginConfigurer.loginProcessingUrl("/login")
+                .formLogin(loginConfigurer -> loginConfigurer.loginProcessingUrl("/login")
                         .loginPage("/")
                         .successForwardUrl("/")
                         .defaultSuccessUrl("/")
@@ -42,14 +50,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         .permitAll())
                 .httpBasic()
                 .and().csrf()
-                .ignoringAntMatchers("/h2-console/**","/api/**");
+                .ignoringAntMatchers("/h2-console/**", "/api/**")
+                .and()
+//                .rememberMe().key("sfg-key").userDetailsService(userDetailsService);
+                .rememberMe().tokenRepository(persistentTokenRepository);
 
         //h2 console config
         http.headers().frameOptions().sameOrigin();
     }
 
     @Bean
-    PasswordEncoder passwordEncoder(){
+    PasswordEncoder passwordEncoder() {
         return MarcusEncoderFactories.createDelegatingPasswordEncoder();
     }
 
@@ -86,19 +97,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 //
 //        return new InMemoryUserDetailsManager(admin, user);
 //    }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 }
