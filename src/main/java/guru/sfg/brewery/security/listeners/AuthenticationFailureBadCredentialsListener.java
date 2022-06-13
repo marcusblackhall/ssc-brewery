@@ -1,10 +1,12 @@
 package guru.sfg.brewery.security.listeners;
 
 import guru.sfg.brewery.domain.security.LoginFailure;
+import guru.sfg.brewery.domain.security.LoginSuccess;
 import guru.sfg.brewery.domain.security.User;
 import guru.sfg.brewery.repositories.security.LoginFailureRepository;
 import guru.sfg.brewery.repositories.security.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.java.Log;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -12,6 +14,9 @@ import org.springframework.security.authentication.event.AuthenticationFailureBa
 import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.stereotype.Component;
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Component
@@ -52,11 +57,28 @@ public class AuthenticationFailureBadCredentialsListener {
 
             LoginFailure failure = builder.build();
             LoginFailure result = loginFailureRepository.save(failure);
+
+            if (result.getUser() != null){
+
+                lockUserAccount(result.getUser());
+
+            }
             log.debug("Login failure was saved with id : {} and name {}", result.getId(), result.getUsername());
 
 
         }
 
+    }
+
+    private void lockUserAccount(User user) {
+
+        List<LoginFailure> failures = loginFailureRepository.findAllByUserAndCreatedDateIsAfter(user,
+               Timestamp.valueOf(LocalDateTime.now().minusDays(1)));
+        if (failures.size() > 3){
+            log.debug("Locking user account {}", user.getUsername());
+            user.setAccountNonLocked(false);
+            userRepository.save(user);
+        }
     }
 
 }
