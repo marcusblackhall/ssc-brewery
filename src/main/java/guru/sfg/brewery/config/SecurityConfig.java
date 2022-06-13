@@ -53,7 +53,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .ignoringAntMatchers("/h2-console/**", "/api/**")
                 .and()
 //                .rememberMe().key("sfg-key").userDetailsService(userDetailsService);
-                .rememberMe().tokenRepository(persistentTokenRepository);
+                .rememberMe().tokenRepository(persistentTokenRepository)
+                .userDetailsService(userDetailsService);
+
 
         //h2 console config
         http.headers().frameOptions().sameOrigin();
