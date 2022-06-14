@@ -29,7 +29,7 @@ public class GoogleCredentialsRepository implements ICredentialRepository {
         User user = userRepository.findByUsername(userName).orElseThrow();
 
         user.setGoogle2FaSecret(secretKey);
-        user.setUserGoogle2fa(true);
+        user.setUseGoogle2fa(true);
 
         userRepository.save(user);
 

@@ -45,12 +45,34 @@ public class UserController {
         log.debug("Entered code is {}",verifyCode);
         if (googleAuthenticator.authorizeUser(user.getUsername(),verifyCode)){
             User savedUser = userRepository.findById(user.getId()).orElseThrow();
-            savedUser.setUserGoogle2fa(true);
+            savedUser.setUseGoogle2fa(true);
             userRepository.save(savedUser);
 
             return "index";
         }else{
             return "user/register2fa";
+        }
+
+    }
+    @GetMapping("/verify2fa")
+    public String verify2fa(){
+
+        return "user/verify2fa";
+
+    }
+
+
+    public String verifyPostOf2fa(@RequestParam Integer verifyCode) {
+
+        User user = getUser();
+
+        log.debug("Entered code is {}",verifyCode);
+        if (googleAuthenticator.authorizeUser(user.getUsername(),verifyCode)){
+            ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).setUseGoogle2fa(false);
+
+            return "index";
+        }else{
+            return "user/verify2fa";
         }
 
     }
