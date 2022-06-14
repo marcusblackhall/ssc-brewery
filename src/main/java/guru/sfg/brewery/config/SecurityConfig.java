@@ -1,17 +1,13 @@
 package guru.sfg.brewery.config;
 
-import guru.sfg.brewery.config.MarcusEncoderFactories;
 import guru.sfg.brewery.security.google.Google2faFilter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 import org.springframework.security.web.session.SessionManagementFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
@@ -20,9 +16,9 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
  * Created by jt on 6/13/20.
  */
 @RequiredArgsConstructor
-//@Configuration
-//@EnableWebSecurity
-//@EnableGlobalMethodSecurity(prePostEnabled = true)
+@Configuration
+@EnableWebSecurity
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
@@ -37,7 +33,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
         http.addFilterBefore(google2faFilter, SessionManagementFilter.class);
 
-        http
+        http.cors().and()
                 .authorizeRequests(authorize -> authorize
                         .antMatchers("/h2-console/**").permitAll() //do not use in production!
                         .antMatchers("/", "/webjars/**", "/login", "/resources/**").permitAll()
@@ -67,7 +63,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         //h2 console config
         http.headers().frameOptions().sameOrigin();
     }
-
 
 
     // @Override

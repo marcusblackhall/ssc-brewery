@@ -24,7 +24,7 @@ public class SecurityBeans {
     }
 
     @Bean
-    public GoogleAuthenticator googleAuthenticator(ICredentialRepository credentialRepository){
+    public GoogleAuthenticator googleAuthenticator(ICredentialRepository credentialRepository) {
 
         GoogleAuthenticatorConfig.GoogleAuthenticatorConfigBuilder configBuilder =
                 new GoogleAuthenticatorConfig.GoogleAuthenticatorConfigBuilder();
@@ -38,14 +38,14 @@ public class SecurityBeans {
         return googleAuthenticator;
     }
 
-@Bean
+    @Bean
     public AuthenticationEventPublisher authenticationEventPublisher(ApplicationEventPublisher applicationEventPublisher) {
 
         return new DefaultAuthenticationEventPublisher(applicationEventPublisher);
     }
 
     @Bean
-    public PersistentTokenRepository persistentTokenRepository(DataSource datasource){
+    public PersistentTokenRepository persistentTokenRepository(DataSource datasource) {
 
         JdbcTokenRepositoryImpl jdbcTokenRepository = new JdbcTokenRepositoryImpl();
         jdbcTokenRepository.setDataSource(datasource);
